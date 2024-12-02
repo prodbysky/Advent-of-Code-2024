@@ -11,7 +11,6 @@ fn main() {
 fn day2_part1() -> i32 {
     let input_name = "inputs/d2_test.txt";
     let input = read_to_string(input_name).unwrap();
-    let mut count = 0;
 
     let valid = |measurements: &[i32]| -> bool {
         let mut i = 1;
@@ -19,8 +18,7 @@ fn day2_part1() -> i32 {
         while i < measurements.len() {
             let curr = measurements[i];
             let prev = measurements[i - 1];
-            let diff = (curr - prev).abs();
-            if !(1..=3).contains(&diff) {
+            if !(1..=3).contains(&(curr - prev).abs()) {
                 return false;
             }
             if curr < prev && increasing {
@@ -34,12 +32,12 @@ fn day2_part1() -> i32 {
         true
     };
 
-    return input
+    input
         .lines()
         .map(|line| line.split_whitespace())
         .map(|split| split.map(|x| x.parse::<i32>().unwrap()))
         .map(|parsed| valid(&parsed.collect::<Vec<_>>()) as i32)
-        .sum();
+        .sum()
 }
 fn day2_part2() -> i32 {
     0
@@ -48,15 +46,11 @@ fn day2_part2() -> i32 {
 fn day1_part1() -> i32 {
     let input_name = "inputs/d1_test.txt";
     let input = read_to_string(input_name).unwrap();
-    let mut left = vec![];
-    let mut right = vec![];
-    input
+    let (mut left, mut right): (Vec<i32>, Vec<i32>) = input
         .lines()
         .map(|line| line.split_whitespace().collect::<Vec<_>>())
-        .for_each(|xs| {
-            left.push(xs[0].parse::<i32>().unwrap());
-            right.push(xs[1].parse::<i32>().unwrap());
-        });
+        .map(|xs| (xs[0].parse::<i32>().unwrap(), xs[1].parse::<i32>().unwrap()))
+        .unzip();
     left.sort();
     right.sort();
     left.iter().zip(right).map(|(a, b)| (a - b).abs()).sum()
@@ -65,22 +59,12 @@ fn day1_part1() -> i32 {
 fn day1_part2() -> i32 {
     let input_name = "inputs/d1_test.txt";
     let input = read_to_string(input_name).unwrap();
-    let mut left = vec![];
-    let mut right = vec![];
-    input
+    let (left, right): (Vec<i32>, Vec<i32>) = input
         .lines()
         .map(|line| line.split_whitespace().collect::<Vec<_>>())
-        .for_each(|xs| {
-            left.push(xs[0].parse::<i32>().unwrap());
-            right.push(xs[1].parse::<i32>().unwrap());
-        });
-    let mut score = 0;
-    for x in left {
-        let mut count = 0;
-        for y in &right {
-            count += (x == *y) as i32;
-        }
-        score += count * x;
-    }
-    score
+        .map(|xs| (xs[0].parse::<i32>().unwrap(), xs[1].parse::<i32>().unwrap()))
+        .unzip();
+    left.iter()
+        .map(|x| right.iter().filter(|&e| e == x).count() as i32 * x)
+        .sum()
 }
